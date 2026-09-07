@@ -7,28 +7,27 @@ system_telemetry = [
     ("srv_05", 95.1, 99, "online")
 ]
 
-# Реализация конвейера агрегации метрик
+# Единый проход: распаковка, фильтрация и сбор метрик одновременно
+active_node_names = []
+cpu_loads = []
+ram_usages = []
 
-# Распаковка кортежей и фильтрация offline-серверов
-active_servers = [
-    (node_name, cpu_load, ram_usage)
-    for node_name, cpu_load, ram_usage, status in system_telemetry
-    if status != "offline"
-]
+for node_name, cpu_load, ram_usage, status in system_telemetry:
+    if status != "offline":
+        active_node_names.append(node_name)
+        cpu_loads.append(cpu_load)
+        ram_usages.append(ram_usage)
 
-# Формирование списка имен активных серверов
-active_node_names = [node_name for node_name, cpu_load, ram_usage in active_servers]
-
-# Формирование отдельных списков показателей для агрегации
-cpu_loads = [cpu_load for node_name, cpu_load, ram_usage in active_servers]
-ram_usages = [ram_usage for node_name, cpu_load, ram_usage in active_servers]
-
-# Рассчёт суммарных показателей через len(), sum(), max()
 active_count = len(active_node_names)
-average_cpu = round(sum(cpu_loads) / active_count, 2)
-max_ram = max(ram_usages)
 
-# Формирование итогового вложенного словаря
+# Защита от ZeroDivisionError, если все серверы offline
+if active_count == 0:
+    average_cpu = 0.0
+    max_ram = 0
+else:
+    average_cpu = round(sum(cpu_loads) / active_count, 2)
+    max_ram = max(ram_usages)
+
 report = {
     "active_nodes_count": active_count,
     "metrics": {
