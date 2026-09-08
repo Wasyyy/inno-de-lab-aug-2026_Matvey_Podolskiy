@@ -7,7 +7,7 @@ class Trainee:
         self.name: str = name
         self.surname: str = surname
         self.passing_grade: int = passing_grade
-        self.__score: int = score
+        self.score = score  
 
     @property
     def score(self) -> int:
@@ -45,7 +45,6 @@ if __name__ == "__main__":
     print("=== ПРОВЕРКА УСПЕВАЕМОСТИ СТАЖЕРА ===")
 
     trainee = Trainee(name="Иван", surname="Иванов", score=9, passing_grade=10)
-
     trainee.do_homework()
     print(f"Баллы: {trainee.score}, Прошел курс: {trainee.is_passing()}")
 
@@ -56,3 +55,8 @@ if __name__ == "__main__":
         trainee.score = -5
     except ValueError as e:
         print(f"Ошибка: {e}")
+
+    try:
+        bad_trainee = Trainee(name="Пётр", surname="Петров", score=-3, passing_grade=10)
+    except ValueError as e:
+        print(f"Ошибка при создании: {e}")
